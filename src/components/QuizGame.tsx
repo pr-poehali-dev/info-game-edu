@@ -14,8 +14,10 @@ interface QuizGameProps {
 }
 
 const QuizGame = ({ category, onBack, onComplete, answeredIds, onAnswer }: QuizGameProps) => {
-  const unanswered = category.questions.filter((q) => !answeredIds.has(q.id));
-  const sorted = [...unanswered].sort((a, b) => a.difficulty - b.difficulty);
+  const [questions] = useState(() => {
+    const unanswered = category.questions.filter((q) => !answeredIds.has(q.id));
+    return [...unanswered].sort((a, b) => a.difficulty - b.difficulty);
+  });
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -24,8 +26,8 @@ const QuizGame = ({ category, onBack, onComplete, answeredIds, onAnswer }: QuizG
   const [showConfetti, setShowConfetti] = useState(false);
   const [streak, setStreak] = useState(0);
 
-  const totalInRound = sorted.length;
-  const question: Question | undefined = sorted[currentIndex];
+  const totalInRound = questions.length;
+  const question: Question | undefined = questions[currentIndex];
 
   const handleSelect = useCallback(
     (index: number) => {
@@ -124,7 +126,7 @@ const QuizGame = ({ category, onBack, onComplete, answeredIds, onAnswer }: QuizG
         <Progress value={progressPct} className="h-2.5" />
       </div>
 
-      <div className="bg-white rounded-2xl p-8 card-glow mb-6 animate-scale-in">
+      <div key={question.id} className="bg-white rounded-2xl p-8 card-glow mb-6 animate-scale-in">
         <div className="text-3xl mb-4">{category.emoji}</div>
         <h2 className="text-xl font-bold text-foreground leading-relaxed">{question.question}</h2>
       </div>
